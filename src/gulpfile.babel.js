@@ -101,7 +101,7 @@ const reload = done => {
 };
 
 /**
- * Function: `styles`.
+ * Function: `processStyles`.
  *
  * This function does the following:
  *    1. Gets the source scss file
@@ -147,7 +147,7 @@ function processStyle( gulpStream, processOptions = {} ) {
 }
 
 /**
- * Function: `stylesRTL`.
+ * Function: `processStylesRTL`.
  *
  * Compiles Sass, Autoprefixes it, Generates RTL stylesheet, and Minifies CSS.
  *
@@ -198,7 +198,7 @@ function processStyleRTL( gulpStream, processOptions = {} ) {
 }
 
 /**
- * Task: `styles`.
+ * Function: `styles`.
  *
  * Compiles Sass, Autoprefixes it and Minifies CSS.
  *
@@ -211,7 +211,7 @@ function processStyleRTL( gulpStream, processOptions = {} ) {
  *    6. Minifies the CSS file and generates style.min.css
  *    7. Injects CSS or reloads the browser via browserSync
  */
-exports.styles = () => {
+function styles() {
 	return	processStyle(
 				gulp.src(
 						config.styleSRC,
@@ -223,7 +223,7 @@ exports.styles = () => {
 };
 
 /**
- * Task: `addonStyles`.
+ * Function: `addonStyles`.
  *
  * Compiles Sass, Autoprefixes it and Minifies CSS.
  *
@@ -236,7 +236,7 @@ exports.styles = () => {
  *    6. Minifies the CSS file and generates .min.css
  *    7. Injects CSS or reloads the browser via browserSync
  */
-exports.addonStyles = ( done ) => {
+function addonStyles( done ) {
 	// Exit task when no addon styles
 	if ( config.addonStyles.length === 0 ) {
 		return done();
@@ -258,7 +258,7 @@ exports.addonStyles = ( done ) => {
 };
 
 /**
- * Task: `stylesRTL`.
+ * Function: `stylesRTL`.
  *
  * Compiles Sass, Autoprefixes it, Generates RTL stylesheet, and Minifies CSS.
  *
@@ -272,7 +272,7 @@ exports.addonStyles = ( done ) => {
  *    8. Minifies the CSS file and generates style-rtl.min.css
  *    9. Injects CSS or reloads the browser via browserSync
  */
-exports.stylesRTL = () => {
+function stylesRTL() {
 	return	processStyleRTL(
 				gulp.src(
 						config.styleSRC,
@@ -284,7 +284,7 @@ exports.stylesRTL = () => {
 };
 
 /**
- * Task: `addonStylesRTL`.
+ * Function: `addonStylesRTL`.
  *
  * Compiles Sass, Autoprefixes it, Generates RTL stylesheet, and Minifies CSS.
  *
@@ -298,7 +298,7 @@ exports.stylesRTL = () => {
  *    8. Minifies the CSS file and generates -rtl.min.css
  *    9. Injects CSS or reloads the browser via browserSync
  */
-exports.addonStylesRTL = ( done ) => {
+function addonStylesRTL( done ) {
 	// Exit task when no addon styles
 	if ( config.addonStyles.length === 0 ) {
 		return done();
@@ -321,7 +321,7 @@ exports.addonStylesRTL = ( done ) => {
 };
 
 /**
- * Task: `vendorsJS`.
+ * Function: `vendorsJS`.
  *
  * Concatenate and uglify vendor JS scripts.
  *
@@ -331,7 +331,7 @@ exports.addonStylesRTL = ( done ) => {
  *     3. Renames the JS file with suffix .min.js
  *     4. Uglifes/Minifies the JS file and generates vendors.min.js
  */
-exports.vendorsJS = () => {
+function vendorsJS() {
 	return gulp
 		.src( config.jsVendorSRC, { since: gulp.lastRun( 'vendorsJS' ) }) // Only run on changed files.
 		.pipe( plumber( errorHandler ) )
@@ -364,7 +364,7 @@ exports.vendorsJS = () => {
 };
 
 /**
- * Task: `customJS`.
+ * Function: `customJS`.
  *
  * Concatenate and uglify custom JS scripts.
  *
@@ -374,7 +374,7 @@ exports.vendorsJS = () => {
  *     3. Renames the JS file with suffix .min.js
  *     4. Uglifes/Minifies the JS file and generates custom.min.js
  */
-exports.customJS = () => {
+function customJS() {
 	return gulp
 		.src( config.jsCustomSRC, { since: gulp.lastRun( 'customJS' ) }) // Only run on changed files.
 		.pipe( plumber( errorHandler ) )
@@ -407,7 +407,7 @@ exports.customJS = () => {
 };
 
 /**
- * Task: `images`.
+ * Function: `images`.
  *
  * Minifies PNG, JPEG, GIF and SVG images.
  *
@@ -422,7 +422,7 @@ exports.customJS = () => {
  * Read the following to change these options.
  * @link https://github.com/sindresorhus/gulp-imagemin
  */
-exports.images = () => {
+function images() {
 	return gulp
 		.src( config.imgSRC )
 		.pipe(
@@ -442,12 +442,12 @@ exports.images = () => {
 };
 
 /**
- * Task: `clear-images-cache`.
+ * Function: `clear-images-cache`.
  *
  * Deletes the images cache. By running the next "images" task,
  * each image will be regenerated.
  */
-exports.clearCache = function( done ) {
+function clearCache( done ) {
 	return cache.clearAll( done );
 };
 
@@ -460,7 +460,7 @@ exports.clearCache = function( done ) {
  * 3. Applies wpPot with the variable set at the top of this file
  * 4. Generate a .pot file of i18n that can be used for l10n to build .mo file
  */
-exports.translate = () => {
+function translate() {
 	return gulp
 		.src( config.watchPhp )
 		.pipe( sort() )
@@ -477,15 +477,24 @@ exports.translate = () => {
 		.pipe( notify({ message: '\n\n✅  ===> TRANSLATE — completed!\n', onLast: true }) );
 };
 
+exports.styles = styles;
+exports.addonStyles = addonStyles;
+exports.stylesRTL = stylesRTL;
+exports.addonStylesRTL = addonStylesRTL;
+exports.vendorsJS = vendorsJS;
+exports.customJS = customJS;
+exports.images = images;
+exports.clearCache = clearCache;
+
 /**
  * Watch Tasks.
  *
  * Watches for file changes and runs specific tasks.
  */
-exports.default = gulp.parallel( 'styles', 'addonStyles', 'vendorsJS', 'customJS', 'images', browsersync, () => {
+exports.default = gulp.parallel( styles, addonStyles, vendorsJS, customJS, images, browsersync, () => {
 	gulp.watch( config.watchPhp, reload ); // Reload on PHP file changes.
-	gulp.watch( config.watchStyles, gulp.parallel( 'styles', 'addonStyles' ) ); // Reload on SCSS file changes.
-	gulp.watch( config.watchJsVendor, gulp.series( 'vendorsJS', reload ) ); // Reload on vendorsJS file changes.
-	gulp.watch( config.watchJsCustom, gulp.series( 'customJS', reload ) ); // Reload on customJS file changes.
-	gulp.watch( config.imgSRC, gulp.series( 'images', reload ) ); // Reload on customJS file changes.
+	gulp.watch( config.watchStyles, gulp.parallel( styles, addonStyles ) ); // Reload on SCSS file changes.
+	gulp.watch( config.watchJsVendor, gulp.series( vendorsJS, reload ) ); // Reload on vendorsJS file changes.
+	gulp.watch( config.watchJsCustom, gulp.series( customJS, reload ) ); // Reload on customJS file changes.
+	gulp.watch( config.imgSRC, gulp.series( images, reload ) ); // Reload on customJS file changes.
 });
