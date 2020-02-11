@@ -442,7 +442,7 @@ function images() {
 };
 
 /**
- * Function: `clear-images-cache`.
+ * Function: `clearCache`.
  *
  * Deletes the images cache. By running the next "images" task,
  * each image will be regenerated.
@@ -477,6 +477,9 @@ function translate() {
 		.pipe( notify({ message: '\n\n✅  ===> TRANSLATE — completed!\n', onLast: true }) );
 };
 
+/**
+ * Export named functions as modules
+ */
 exports.styles = styles;
 exports.addonStyles = addonStyles;
 exports.stylesRTL = stylesRTL;
